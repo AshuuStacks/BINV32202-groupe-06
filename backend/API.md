@@ -32,6 +32,7 @@ Toute erreur a la même forme :
 | 401 | `UNAUTHENTICATED` | Session absente, expirée ou invalide ; compte non autorisé à se connecter |
 | 403 | `FORBIDDEN` | Utilisateur connecté, mais sans droit sur la ressource |
 | 404 | `NOT_FOUND` | Route inconnue |
+| 409 | `OFFER_NOT_PUBLISHED`, `ALREADY_APPLIED`, `APPLICATION_ALREADY_PROCESSED` | Conflit avec l'état courant de la ressource |
 | 500 | `INTERNAL_ERROR` | Erreur inattendue du serveur |
 
 ## GET /health
@@ -168,3 +169,47 @@ récente à la plus ancienne, puis de la plus récente à la plus ancienne.
 
 - `401` `UNAUTHENTICATED` : session absente ou invalide.
 - `403` `FORBIDDEN` : contact seulement promoteur ou signataire.
+
+## GET /applications
+
+Liste les candidatures de l'étudiant connecté, de la plus récente à la plus ancienne.
+
+- `200` : tableau contenant `id`, `offerId`, `offerTitle`, `companyShortName`, `message`,
+  `status` et `appliedAt`.
+- `status` vaut `IN_PROGRESS` (En cours), `SELECTED` (Retenue), `REJECTED` (Non retenue)
+  ou `WITHDRAWN` (Retirée).
+- `401` `UNAUTHENTICATED` : session absente ou invalide.
+- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
+
+## POST /applications
+
+Crée une candidature pour l'étudiant connecté.
+
+### Requête
+
+- Header `Authorization` obligatoire.
+- Body JSON : `{ "offerId": 1, "message": "Message facultatif" }`.
+
+L'offre doit être publiée. Le message peut être omis ou être vide. Une candidature
+non retirée existante pour la même offre empêche une nouvelle candidature ; une
+candidature retirée peut être recréée.
+
+### Réponses
+
+- `201` : la candidature créée.
+- `400` `INVALID_BODY` : corps invalide ou message de plus de 2000 caractères.
+- `401` `UNAUTHENTICATED` : session absente ou invalide.
+- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
+- `404` `NOT_FOUND` : offre inconnue.
+- `409` `OFFER_NOT_PUBLISHED` ou `ALREADY_APPLIED`.
+
+## DELETE /applications/:id
+
+Retire une candidature de l'étudiant connecté. Seule une candidature `IN_PROGRESS`
+peut être retirée.
+
+- `204` : candidature retirée.
+- `401` `UNAUTHENTICATED` : session absente ou invalide.
+- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
+- `404` `NOT_FOUND` : candidature inconnue ou appartenant à un autre étudiant.
+- `409` `APPLICATION_ALREADY_PROCESSED` : candidature déjà traitée.

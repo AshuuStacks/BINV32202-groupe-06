@@ -3,6 +3,7 @@ import ErrorState from "../components/ErrorState.tsx";
 import LoadingState from "../components/LoadingState.tsx";
 import OfferTable from "../components/OfferTable.tsx";
 import { useOffers } from "../hooks/useOffers.ts";
+import { useApplications } from "../hooks/useApplications.ts";
 import type { User } from "../models/user.ts";
 
 interface OffersPageProps {
@@ -19,9 +20,11 @@ const DESCRIPTIONS = {
 
 const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
   const { offers, isLoading, error } = useOffers(token, onUnauthorized);
+  const applicationsApi = useApplications(token, onUnauthorized, user.kind === "STUDENT");
 
   const renderContent = () => {
     if (error) return <ErrorState message={error} />;
+    if (applicationsApi.error) return <ErrorState message={applicationsApi.error} />;
     if (isLoading) return <LoadingState />;
     if (offers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
     return (
@@ -29,7 +32,11 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
         <p className="result-count">
           {offers.length} offre{offers.length > 1 ? "s" : ""}
         </p>
-        <OfferTable offers={offers} />
+        <OfferTable
+          offers={offers}
+          applications={applicationsApi.applications}
+          onApply={user.kind === "STUDENT" ? applicationsApi.apply : undefined}
+        />
       </>
     );
   };
