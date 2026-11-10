@@ -26,6 +26,7 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
 
   const renderContent = () => {
     if (error) return <ErrorState message={error} />;
+    if (applicationsApi.error) return <ErrorState message={applicationsApi.error} />;
     if (isLoading) return <LoadingState />;
     if (offers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
     return (
@@ -33,7 +34,11 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
         <p className="result-count">
           {offers.length} offre{offers.length > 1 ? "s" : ""}
         </p>
-        <OfferTable offers={offers} />
+        <OfferTable
+          offers={offers}
+          applications={applicationsApi.applications}
+          onApply={user.kind === "STUDENT" ? applicationsApi.apply : undefined}
+        />
       </>
     );
   };
