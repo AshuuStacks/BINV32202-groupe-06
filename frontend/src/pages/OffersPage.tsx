@@ -3,6 +3,7 @@ import EmptyState from "../components/EmptyState.tsx";
 import ErrorState from "../components/ErrorState.tsx";
 import LoadingState from "../components/LoadingState.tsx";
 import OfferTable from "../components/OfferTable.tsx";
+import { useApplications } from "../hooks/useApplications.ts";
 import { useOffers } from "../hooks/useOffers.ts";
 import type { PeriodCode } from "../models/offer.ts";
 import type { User } from "../models/user.ts";
@@ -23,11 +24,12 @@ const DESCRIPTIONS = {
 const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
   const [period, setPeriod] = useState<PeriodCode | "">("");
   const { offers, isLoading, error } = useOffers(token, period, onUnauthorized);
+  const applicationsApi = useApplications(token, onUnauthorized, user.kind === "STUDENT");
 
   const renderContent = () => {
     if (error) return <ErrorState message={error} />;
     if (applicationsApi.error) return <ErrorState message={applicationsApi.error} />;
-    if (isLoading) return <LoadingState />;
+    if (isLoading || applicationsApi.isLoading) return <LoadingState />;
     if (offers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
     return (
       <>
