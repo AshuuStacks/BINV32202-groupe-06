@@ -1,6 +1,6 @@
 import request from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
-import { OFFER, STUDENT } from "../src/db/seed/seedIds.ts";
+import { APPLICATION, OFFER, STUDENT } from "../src/db/seed/seedIds.ts";
 import { createTestApp, tokenFor } from "./helpers/testApp.ts";
 
 let app: ReturnType<typeof createTestApp>;
@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 describe("applications étudiant", () => {
-  it("liste les candidatures de l'étudiant avec les quatre statuts", async () => {
+  it("liste les candidatures de l'étudiant avec leurs statuts", async () => {
     const response = await request(app)
       .get("/applications")
       .set("Authorization", tokenFor("STUDENT", STUDENT.INES_HADDAD));
@@ -19,6 +19,17 @@ describe("applications étudiant", () => {
     expect(response.body.map((application: { status: string }) => application.status)).toEqual([
       "IN_PROGRESS",
       "WITHDRAWN",
+    ]);
+  });
+
+  it("ne retourne que les candidatures de l'étudiant connecté", async () => {
+    const response = await request(app)
+      .get("/applications")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(response.body.map((application: { offerId: number }) => application.offerId)).toEqual([
+      OFFER.FLEET_APP,
     ]);
   });
 
@@ -40,6 +51,20 @@ describe("applications étudiant", () => {
     expect(response.body).toMatchObject({
       offerId: OFFER.INTERNAL_CHATBOT,
       message: "Votre sujet m'intéresse.",
+      status: "IN_PROGRESS",
+    });
+  });
+
+  it("crée une candidature sans message", async () => {
+    const response = await request(app)
+      .post("/applications")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.IOANA_POPESCU))
+      .send({ offerId: OFFER.INTERNAL_CHATBOT });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      offerId: OFFER.INTERNAL_CHATBOT,
+      message: null,
       status: "IN_PROGRESS",
     });
   });
@@ -75,5 +100,14 @@ describe("applications étudiant", () => {
 
     expect(response.status).toBe(409);
     expect(response.body.error.code).toBe("APPLICATION_ALREADY_PROCESSED");
+  });
+
+  it("n'autorise pas un étudiant à retirer la candidature d'un autre étudiant", async () => {
+    const response = await request(app)
+      .delete(`/applications/${APPLICATION.INES_FLEET_APP}`)
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(404);
+    expect(response.body.error.code).toBe("NOT_FOUND");
   });
 });
