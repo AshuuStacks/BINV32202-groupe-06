@@ -136,6 +136,12 @@ entreprises ; les autres utilisateurs ne voient que les entreprises actives.
 Liste les offres visibles par l'utilisateur connecté, de l'année académique la plus
 récente à la plus ancienne, puis de la plus récente à la plus ancienne.
 
+### Filtre facultatif
+
+Le paramètre `period` limite les résultats à une période : `P1`, `P2` ou `OTHER`.
+Sans ce paramètre, toutes les offres normalement visibles sont retournées. Le filtre
+ne modifie pas les règles de visibilité liées au profil.
+
 | Profil | Offres retournées |
 |---|---|
 | Administrateur | Toutes |
@@ -146,6 +152,7 @@ récente à la plus ancienne, puis de la plus récente à la plus ancienne.
 ### Requête
 
 - Header `Authorization` obligatoire
+- Paramètre facultatif `period` : `P1`, `P2` ou `OTHER`.
 
 ### Réponses
 
@@ -169,47 +176,4 @@ récente à la plus ancienne, puis de la plus récente à la plus ancienne.
 
 - `401` `UNAUTHENTICATED` : session absente ou invalide.
 - `403` `FORBIDDEN` : contact seulement promoteur ou signataire.
-
-## GET /applications
-
-Liste les candidatures de l'étudiant connecté, de la plus récente à la plus ancienne.
-
-- `200` : tableau contenant `id`, `offerId`, `offerTitle`, `companyShortName`, `message`,
-  `status` et `appliedAt`.
-- `status` vaut `IN_PROGRESS` (En cours), `SELECTED` (Retenue), `REJECTED` (Non retenue)
-  ou `WITHDRAWN` (Retirée).
-- `401` `UNAUTHENTICATED` : session absente ou invalide.
-- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
-
-## POST /applications
-
-Crée une candidature pour l'étudiant connecté.
-
-### Requête
-
-- Header `Authorization` obligatoire.
-- Body JSON : `{ "offerId": 1, "message": "Message facultatif" }`.
-
-L'offre doit être publiée. Le message peut être omis ou être vide. Une candidature
-non retirée existante pour la même offre empêche une nouvelle candidature ; une
-candidature retirée peut être recréée.
-
-### Réponses
-
-- `201` : la candidature créée.
-- `400` `INVALID_BODY` : corps invalide ou message de plus de 2000 caractères.
-- `401` `UNAUTHENTICATED` : session absente ou invalide.
-- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
-- `404` `NOT_FOUND` : offre inconnue.
-- `409` `OFFER_NOT_PUBLISHED` ou `ALREADY_APPLIED`.
-
-## DELETE /applications/:id
-
-Retire une candidature de l'étudiant connecté. Seule une candidature `IN_PROGRESS`
-peut être retirée.
-
-- `204` : candidature retirée.
-- `401` `UNAUTHENTICATED` : session absente ou invalide.
-- `403` `FORBIDDEN` : l'utilisateur connecté n'est pas un étudiant.
-- `404` `NOT_FOUND` : candidature inconnue ou appartenant à un autre étudiant.
-- `409` `APPLICATION_ALREADY_PROCESSED` : candidature déjà traitée.
+- `400` `INVALID_QUERY` : `period` est invalide ou répété.

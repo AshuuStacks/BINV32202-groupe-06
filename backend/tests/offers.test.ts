@@ -13,6 +13,11 @@ beforeEach(() => {
 const listOffersAs = (kind: UserKind, id: number) =>
   request(app).get("/offers").set("Authorization", tokenFor(kind, id));
 
+const listOffersAsWithPeriod = (kind: UserKind, id: number, period: string) =>
+  request(app)
+    .get(`/offers?period=${period}`)
+    .set("Authorization", tokenFor(kind, id));
+
 const offerIds = (body: { id: number }[]): number[] => body.map((offer) => offer.id);
 
 describe("GET /offers : accès", () => {
@@ -95,5 +100,66 @@ describe("GET /offers : visibilité selon le profil", () => {
     expect(Object.keys(response.body[0]).sort()).toEqual(
       ["academicYear", "companyShortName", "id", "period", "status", "title"],
     );
+  });
+});
+
+describe("GET /offers : filtre par période", () => {
+  it("retourne toutes les offres visibles sans filtre", async () => {
+    const response = await listOffersAs("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ);
+
+    expect(response.body).toHaveLength(10);
+  });
+
+  it("filtre les offres d'un administrateur sur P1", async () => {
+    const response = await listOffersAsWithPeriod(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "P1",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.map((offer: { period: string }) => offer.period)).toEqual(["P1"]);
+  });
+
+  it("combine le filtre avec la visibilité d'un étudiant", async () => {
+    const response = await listOffersAsWithPeriod("STUDENT", STUDENT.LUCAS_DUPONT, "P2");
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([
+      OFFER.INTERNAL_CHATBOT,
+      OFFER.DATA_QUALITY,
+      OFFER.FLEET_APP,
+      OFFER.BILLING_API,
+    ]);
+    expect(response.body.every((offer: { status: string }) => offer.status === "PUBLISHED")).toBe(
+      true,
+    );
+  });
+
+  it("combine le filtre avec les offres propres à un déposant", async () => {
+    const response = await listOffersAsWithPeriod("CONTACT", CONTACT.MARC_LEJEUNE, "OTHER");
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.E2E_TESTS]);
+  });
+
+  it("refuse une période inconnue", async () => {
+    const response = await listOffersAsWithPeriod(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "UNKNOWN",
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("INVALID_QUERY");
+  });
+
+  it("refuse une période répétée", async () => {
+    const response = await request(app)
+      .get("/offers?period=P1&period=P2")
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("INVALID_QUERY");
   });
 });
