@@ -100,3 +100,8 @@ Une règle utile à vérifier automatiquement serait que les services backend ne
 - `frontend/tests/OffersPage.test.tsx` — tests de la page des offres.
 - `backend/src/services/applications.service.ts` — règles métier appliquées côté serveur.
 - `seance-02.pdf` à `seance-05.pdf` (dépôt BINV2150A-slides) — références de cours pour l'audit Web 2; reçues en pièces jointes, non copiées dans le dépôt du projet.
+
+
+## IA crédits avec Copilot / Codex 
+- Ashutosh 0% Utilisation de Codex (Version Copilot de ChatGPT)
+- Yuhang Wu 15% Utilisation de Copilot
