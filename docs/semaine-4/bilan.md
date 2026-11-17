@@ -30,6 +30,10 @@ comparaison de l'expression en minuscules dans le service.
 
 ## Recherche d'offres
 
+EF-30 est partiellement implémentée dans ce projet : cette séance ajoute la recherche par
+titre et le filtre par période. La recherche par entreprise ou localité et les filtres
+par année académique, entreprise, localité ou statut restent hors du périmètre réalisé.
+
 La route `GET /offers` accepte `q`, retire les espaces de bordure et cherche une expression
 continue dans le titre, sans distinction de casse. Une recherche vide n'ajoute pas de
 filtre. Le filtre est combiné à la période et aux règles de visibilité déjà présentes.
@@ -103,9 +107,13 @@ absolue.
 
 ## Crédits IA
 
-- Ashutosh Man Shrestha : à compléter par le membre du groupe; crédits consommés : à
-  compléter.
-- Yuhang Wu : à compléter par le membre du groupe; crédits consommés : à compléter.
+- Ashutosh Man Shrestha : cette séance est documentée comme un travail avec Codex; le
+  nombre de crédits consommés n'est pas fourni par le dépôt ni par le transcript et doit
+  être renseigné depuis une source de mesure réelle. Sa part de contribution doit être
+  confirmée par le groupe.
+- Yuhang Wu : aucun relevé d'utilisation ou de crédits n'est disponible dans les éléments
+  consultés; sa part de contribution et ses crédits consommés doivent être confirmés par
+  le membre et le groupe.
 
 ## Conversations
 
