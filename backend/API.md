@@ -138,9 +138,11 @@ récente à la plus ancienne, puis de la plus récente à la plus ancienne.
 
 ### Filtre facultatif
 
-Le paramètre `period` limite les résultats à une période : `P1`, `P2` ou `OTHER`.
-Sans ce paramètre, toutes les offres normalement visibles sont retournées. Le filtre
-ne modifie pas les règles de visibilité liées au profil.
+Le paramètre `q` recherche une expression contenue dans le titre, sans tenir compte de la
+casse. Les espaces au début et à la fin sont ignorés. Les mots sont recherchés comme une
+expression continue. Une valeur vide est ignorée. Le paramètre `period` limite aussi les
+résultats à une période : `P1`, `P2` ou `OTHER`. Les filtres se combinent et ne modifient
+pas les règles de visibilité liées au profil.
 
 | Profil | Offres retournées |
 |---|---|
@@ -152,6 +154,7 @@ ne modifie pas les règles de visibilité liées au profil.
 ### Requête
 
 - Header `Authorization` obligatoire
+- Paramètre facultatif `q` : expression recherchée dans le titre.
 - Paramètre facultatif `period` : `P1`, `P2` ou `OTHER`.
 
 ### Réponses
@@ -176,4 +179,4 @@ ne modifie pas les règles de visibilité liées au profil.
 
 - `401` `UNAUTHENTICATED` : session absente ou invalide.
 - `403` `FORBIDDEN` : contact seulement promoteur ou signataire.
-- `400` `INVALID_QUERY` : `period` est invalide ou répété.
+- `400` `INVALID_QUERY` : `period` est invalide ou répété, ou `q` est répété.

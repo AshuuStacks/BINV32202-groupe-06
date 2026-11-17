@@ -18,6 +18,11 @@ const listOffersAsWithPeriod = (kind: UserKind, id: number, period: string) =>
     .get(`/offers?period=${period}`)
     .set("Authorization", tokenFor(kind, id));
 
+const listOffersAsWithQuery = (kind: UserKind, id: number, query: string) =>
+  request(app)
+    .get(`/offers?q=${encodeURIComponent(query)}`)
+    .set("Authorization", tokenFor(kind, id));
+
 const offerIds = (body: { id: number }[]): number[] => body.map((offer) => offer.id);
 
 describe("GET /offers : accès", () => {
@@ -161,5 +166,79 @@ describe("GET /offers : filtre par période", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe("INVALID_QUERY");
+  });
+});
+
+describe("GET /offers : recherche par titre", () => {
+  it("recherche sans tenir compte de la casse et ignore les espaces en bordure", async () => {
+    const response = await listOffersAsWithQuery(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "  aSsIsTaNt CoNvErSaTiOnNeL  ",
+    );
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.INTERNAL_CHATBOT]);
+  });
+
+  it("ignore aussi la casse des lettres accentuées sans supprimer les accents", async () => {
+    const response = await listOffersAsWithQuery(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "QUALITÉ DES DONNÉES",
+    );
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.DATA_QUALITY]);
+  });
+
+  it("recherche l'expression entière lorsque plusieurs mots sont saisis", async () => {
+    const response = await listOffersAsWithQuery(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "Assistant interne",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
+  });
+
+  it("retourne une liste vide sans correspondance", async () => {
+    const response = await listOffersAsWithQuery(
+      "ADMIN",
+      ADMINISTRATOR.ANNE_LECLERCQ,
+      "offre inexistante",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
+  });
+
+  it("traite une recherche vide comme une liste normale", async () => {
+    const response = await listOffersAsWithQuery("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ, "  ");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(10);
+  });
+
+  it("combine la recherche avec la période", async () => {
+    const response = await request(app)
+      .get(`/offers?q=${encodeURIComponent("API REST")}&period=P2`)
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.BILLING_API]);
+    expect(response.body[0].period).toBe("P2");
+  });
+
+  it("préserve la visibilité limitée aux offres publiées pour un étudiant", async () => {
+    const response = await listOffersAsWithQuery(
+      "STUDENT",
+      STUDENT.LUCAS_DUPONT,
+      "Migration d'une application vers le cloud",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
   });
 });

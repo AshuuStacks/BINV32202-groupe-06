@@ -10,6 +10,7 @@ import { isUnauthorized } from "../utils/api.ts";
 export const useOffers = (
   token: string,
   period: PeriodCode | "",
+  titleQuery: string,
   onUnauthorized: () => void,
 ) => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -19,7 +20,7 @@ export const useOffers = (
   useEffect(() => {
     const controller = new AbortController();
 
-    getOffers(token, period, controller.signal)
+    getOffers(token, period, titleQuery, controller.signal)
       .then((data) => {
         if (!controller.signal.aborted) setOffers(data);
       })
@@ -36,7 +37,7 @@ export const useOffers = (
       });
 
     return () => controller.abort();
-  }, [token, period, onUnauthorized]);
+  }, [token, period, titleQuery, onUnauthorized]);
 
   return { offers, isLoading, error };
 };

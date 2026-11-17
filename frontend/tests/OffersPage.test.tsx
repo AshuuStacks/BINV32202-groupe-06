@@ -83,4 +83,43 @@ describe("OffersPage", () => {
       signal: expect.any(AbortSignal),
     }));
   });
+
+  it("combine la recherche par titre et la période dans l'appel API", async () => {
+    const fetchMock = stubFetch({
+      "/api/offers": () => Response.json(offers),
+      "/api/offers?q=API+REST&period=P1": () => Response.json([]),
+    });
+
+    render(<OffersPage user={adminUser} token="jeton" onUnauthorized={vi.fn()} />);
+    await screen.findByText("Refonte du portail client");
+
+    fireEvent.change(screen.getByLabelText("Rechercher par titre"), {
+      target: { value: "API REST" },
+    });
+    fireEvent.change(screen.getByLabelText("Période"), { target: { value: "P1" } });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        "/api/offers?q=API+REST&period=P1",
+        {
+          headers: { Authorization: "jeton" },
+          signal: expect.any(AbortSignal),
+        },
+      ),
+    );
+  });
+
+  it("affiche un message adapté si la recherche ne trouve aucun titre", async () => {
+    stubFetch({ "/api/offers": () => Response.json([]) });
+
+    render(<OffersPage user={adminUser} token="jeton" onUnauthorized={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("Rechercher par titre"), {
+      target: { value: "titre absent" },
+    });
+
+    expect(
+      await screen.findByText("Aucune offre ne correspond à la recherche."),
+    ).toBeInTheDocument();
+  });
 });

@@ -77,3 +77,11 @@ This is an npm-workspaces monorepo with two independently built TypeScript appli
   authorization/error statuses.
 - Follow the repository pull request template, including its API documentation,
   migration, browser-testing, permission, and conversation-export checklist items.
+
+## TDD and application changes
+
+Before implementation, prepare a small set of tests, run them, and explain the expected
+and observed results. End that response by asking the user to validate the tests. Wait
+for the user's explicit validation before changing application code. Preserve existing
+project code. If a new business decision appears later, ask the user to validate it
+before proceeding. Follow `.github/skills/test-driven-development/SKILL.md`.
