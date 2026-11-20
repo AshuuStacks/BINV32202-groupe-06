@@ -17,7 +17,7 @@
 
 ## Travail avec l'agent
 
-- [ ] Conversation exportée dans `docs/conversation-N.md`
+- [ ] Conversations exportées en Markdown dans `docs/semaine-X/conversations/`
 
 <!-- Ce que l'agent a bien fait, ce qu'il a fallu corriger ou refuser. -->
 

@@ -88,7 +88,9 @@ Les outils ont été choisis pour rester simples et lisibles :
 - Connexion de démonstration, navigation adaptée au profil, déconnexion.
 - **Entreprises** : liste et recherche par nom (`GET /companies`). Un administrateur voit
   toutes les entreprises ; les autres utilisateurs, seulement les entreprises actives.
-- **Offres** : liste en lecture seule (`GET /offers`), filtrée selon le profil :
+- **Offres** : liste en lecture seule (`GET /offers`) avec recherche par expression dans
+  le titre (`q`) et filtre facultatif par période (`period`), en plus des règles de
+  visibilité selon le profil :
   - l'administrateur voit toutes les offres ;
   - l'étudiant voit les offres publiées ;
   - le déposant voit les offres qu'il a déposées ;
@@ -99,11 +101,13 @@ Les outils ont été choisis pour rester simples et lisibles :
 
 ## Ce qui n'est pas implémenté
 
-Ces fonctionnalités du cahier des charges n'existent pas encore, ni dans l'API ni dans
+Les fonctionnalités suivantes du cahier des charges restent à implémenter dans l'API et
 l'interface :
 
 - création d'une offre par un déposant, modification ou retrait ;
-- recherche et filtrage des offres (année, période, statut…) ;
+- recherche par entreprise ou localité et filtres d'offres par année académique,
+  entreprise, localité ou statut (la recherche par titre et le filtre par période sont
+  déjà disponibles) ;
 - validation, mise en attente, publication ou archivage d'une offre par un administrateur ;
 - candidature d'un étudiant et retrait d'une candidature ;
 - sélection d'un candidat et création du stage ;

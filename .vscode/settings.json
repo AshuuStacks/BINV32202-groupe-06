@@ -78,5 +78,6 @@
   "chat.agent.sandbox.lspServers": true,
 
   // Bloque également les outils Fetch et navigateur intégrés.
-  "chat.agent.networkFilter": true
+  "chat.agent.networkFilter": true,
+  "python.terminal.useEnvFile": true
 }
