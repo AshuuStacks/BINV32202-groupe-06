@@ -1,0 +1,8 @@
+[mcp_servers.playwright]
+url = "http://localhost:8931/mcp"
+
+[mcp_servers.playwright.tools.browser_click]
+approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_fill_form]
+approval_mode = "approve"
