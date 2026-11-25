@@ -111,9 +111,7 @@ absolue.
   nombre de crédits consommés n'est pas fourni par le dépôt ni par le transcript et doit
   être renseigné depuis une source de mesure réelle. Sa part de contribution doit être
   confirmée par le groupe.
-- Yuhang Wu : aucun relevé d'utilisation ou de crédits n'est disponible dans les éléments
-  consultés; sa part de contribution et ses crédits consommés doivent être confirmés par
-  le membre et le groupe.
+
 
 ## Conversations
 
