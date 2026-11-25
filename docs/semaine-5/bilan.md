@@ -81,15 +81,25 @@ le code applicatif.
 
 1. **Que permet Playwright MCP dans la conversation avec l’agent ? Quelle action précise avez-vous vu passer par un outil MCP ?**
 
-   Réponse :
+   Réponse : Playwright MCP rend les commandes du navigateur accessibles à l’agent
+   comme des outils pendant la conversation. J’ai vu `browser_navigate` ouvrir
+   l’application locale et `browser_snapshot` renvoyer l’état accessible de la page,
+   notamment les offres correspondant à la recherche.
 
 2. **Qu’apportent les scripts Playwright Test que le compte rendu d’un test par MCP n’apporte pas ?**
 
-   Réponse :
+   Réponse : Playwright Test conserve des vérifications sous forme de code versionné
+   que l’on peut relancer de manière reproductible, sans agent. Les assertions
+   vérifient automatiquement le résultat et font échouer la suite si une régression
+   apparaît; un compte rendu MCP seul ne garantit pas ces vérifications lors d’une
+   exécution future.
 
 3. **Dans quel cas préféreriez-vous une exploration interactive avec MCP ? Dans quel cas préféreriez-vous un test automatisé ?**
 
-   Réponse :
+   Réponse : Je choisirais MCP pour explorer rapidement une interface, vérifier un
+   parcours inhabituel ou observer un problème en interaction avec l’agent. Je
+   choisirais Playwright Test pour les parcours importants à contrôler à chaque
+   changement, notamment dans une suite de vérification ou une intégration continue.
 
 ## Conversations
 
